@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import socket
 import whois
@@ -12,7 +12,7 @@ from collections import defaultdict
 import asyncio
 import aiohttp
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 # Кэш результатов
