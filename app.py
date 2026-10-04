@@ -6,11 +6,14 @@ import phonenumbers
 from phonenumbers import geocoder, carrier
 import requests
 import re
+import ssl
+import dns.resolver
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
 from collections import defaultdict
 import asyncio
 import aiohttp
+import subprocess
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -32,7 +35,9 @@ patterns = {
     'phone': re.compile(r'^\+?[1-9]\d{1,14}$'),
     'domain': re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$'),
     'url': re.compile(r'^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),
-    'username': re.compile(r'^[a-zA-Z0-9_]{3,30}$')
+    'username': re.compile(r'^[a-zA-Z0-9_]{3,30}$'),
+    'mac': re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'),
+    'hash': re.compile(r'^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$')
 }
 
 def get_cache_key(data_type: str, value: str) -> str:
@@ -83,6 +88,10 @@ def detect_input_type(text: str) -> Tuple[str, str]:
         return 'url', text
     elif patterns['username'].match(text):
         return 'username', text
+    elif patterns['mac'].match(text):
+        return 'mac', text
+    elif patterns['hash'].match(text):
+        return 'hash', text
     elif any(c.isdigit() for c in text) and '+' in text:
         return 'phone', text
     elif '.' in text and len(text.split('.')) > 1:
@@ -398,6 +407,229 @@ def detect_type():
     
     data_type, value = detect_input_type(input_data)
     return jsonify({'type': data_type, 'value': value})
+
+@app.route('/api/mac', methods=['POST'])
+def lookup_mac():
+    data = request.json
+    mac_address = data.get('mac')
+    session_id = data.get('session_id', 'default')
+    
+    if not mac_address:
+        return jsonify({'error': 'MAC address required'}), 400
+    
+    try:
+        # Normalize MAC address
+        mac_clean = mac_address.replace('-', ':').upper()
+        
+        # Use IEEE OUI database via API
+        response = requests.get(f'https://api.macvendors.com/{mac_clean}')
+        
+        if response.status_code == 200:
+            vendor = response.text
+        else:
+            vendor = 'Unknown'
+        
+        formatted = {
+            'type': 'mac',
+            'value': mac_address,
+            'vendor': vendor,
+            'normalized': mac_clean
+        }
+        
+        save_to_cache('mac', mac_address, formatted)
+        add_to_history(session_id, 'mac', mac_address, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/hash', methods=['POST'])
+def lookup_hash():
+    data = request.json
+    hash_value = data.get('hash')
+    session_id = data.get('session_id', 'default')
+    
+    if not hash_value:
+        return jsonify({'error': 'Hash required'}), 400
+    
+    try:
+        # Determine hash type based on length
+        hash_len = len(hash_value)
+        if hash_len == 32:
+            hash_type = 'MD5'
+        elif hash_len == 40:
+            hash_type = 'SHA1'
+        elif hash_len == 64:
+            hash_type = 'SHA256'
+        else:
+            hash_type = 'Unknown'
+        
+        # Try to search in VirusTotal (free API limited)
+        formatted = {
+            'type': 'hash',
+            'value': hash_value,
+            'hash_type': hash_type,
+            'note': 'For full analysis, use VirusTotal or similar services'
+        }
+        
+        add_to_history(session_id, 'hash', hash_value, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ssl', methods=['POST'])
+def check_ssl():
+    data = request.json
+    domain = data.get('domain')
+    session_id = data.get('session_id', 'default')
+    
+    if not domain:
+        return jsonify({'error': 'Domain required'}), 400
+    
+    try:
+        # Get SSL certificate info
+        context = ssl.create_default_context()
+        with socket.create_connection((domain, 443)) as sock:
+            with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                cert = ssock.getpeercert()
+                
+        formatted = {
+            'type': 'ssl',
+            'value': domain,
+            'subject': dict(x[0] for x in cert['subject']),
+            'issuer': dict(x[0] for x in cert['issuer']),
+            'version': cert['version'],
+            'serial': cert['serialNumber'],
+            'not_before': cert['notBefore'],
+            'not_after': cert['notAfter']
+        }
+        
+        add_to_history(session_id, 'ssl', domain, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dns-full', methods=['POST'])
+def lookup_dns_full():
+    data = request.json
+    domain = data.get('domain')
+    session_id = data.get('session_id', 'default')
+    
+    if not domain:
+        return jsonify({'error': 'Domain required'}), 400
+    
+    try:
+        records = {}
+        
+        # A records
+        try:
+            answers = dns.resolver.resolve(domain, 'A')
+            records['A'] = [str(rdata) for rdata in answers]
+        except:
+            records['A'] = []
+        
+        # MX records
+        try:
+            answers = dns.resolver.resolve(domain, 'MX')
+            records['MX'] = [str(rdata) for rdata in answers]
+        except:
+            records['MX'] = []
+        
+        # TXT records
+        try:
+            answers = dns.resolver.resolve(domain, 'TXT')
+            records['TXT'] = [str(rdata) for rdata in answers]
+        except:
+            records['TXT'] = []
+        
+        # NS records
+        try:
+            answers = dns.resolver.resolve(domain, 'NS')
+            records['NS'] = [str(rdata) for rdata in answers]
+        except:
+            records['NS'] = []
+        
+        # CNAME records
+        try:
+            answers = dns.resolver.resolve(domain, 'CNAME')
+            records['CNAME'] = [str(rdata) for rdata in answers]
+        except:
+            records['CNAME'] = []
+        
+        formatted = {
+            'type': 'dns-full',
+            'value': domain,
+            'records': records
+        }
+        
+        add_to_history(session_id, 'dns-full', domain, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/http-headers', methods=['POST'])
+def analyze_http_headers():
+    data = request.json
+    url = data.get('url')
+    session_id = data.get('session_id', 'default')
+    
+    if not url:
+        return jsonify({'error': 'URL required'}), 400
+    
+    # Ensure URL has protocol
+    if not url.startswith('http'):
+        url = 'https://' + url
+    
+    try:
+        response = requests.head(url, timeout=10, allow_redirects=True)
+        
+        formatted = {
+            'type': 'http-headers',
+            'value': url,
+            'status_code': response.status_code,
+            'headers': dict(response.headers)
+        }
+        
+        add_to_history(session_id, 'http-headers', url, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/wayback', methods=['POST'])
+def lookup_wayback():
+    data = request.json
+    url = data.get('url')
+    session_id = data.get('session_id', 'default')
+    
+    if not url:
+        return jsonify({'error': 'URL required'}), 400
+    
+    # Ensure URL has protocol
+    if not url.startswith('http'):
+        url = 'https://' + url
+    
+    try:
+        # Wayback Machine CDX API
+        wayback_url = f'http://web.archive.org/cdx/search/cdx?url={url}&output=json&limit=5'
+        response = requests.get(wayback_url)
+        
+        if response.status_code == 200:
+            data_json = response.json()
+            # Skip header row
+            snapshots = data_json[1:] if len(data_json) > 1 else []
+        else:
+            snapshots = []
+        
+        formatted = {
+            'type': 'wayback',
+            'value': url,
+            'snapshots': snapshots[:5],
+            'total': len(snapshots)
+        }
+        
+        add_to_history(session_id, 'wayback', url, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/')
 def index():
