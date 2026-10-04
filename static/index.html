@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: #0a0a0a;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .result-card {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator span {
+            animation: pulse 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .tag {
+            background: rgba(99, 102, 241, 0.1);
+            color: #a5b4fc;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="p-6 border-b border-white/5">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="font-semibold text-lg tracking-tight">OSINT</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="showHistory()" class="p-2 hover:bg-white/5 rounded-lg transition">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="showCorrelations()" class="p-2 hover:bg-white/5 rounded-lg transition">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- Search -->
+                <div class="glass rounded-2xl p-8 mb-6">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="IP, domain, email, phone, username..."
+                            class="w-full px-5 py-4 input-glass rounded-xl text-white placeholder-gray-500 focus:outline-none transition text-sm"
+                            onkeypress="if(event.key === 'Enter') performSearch()"
+                        >
+                        <button 
+                            onclick="performSearch()"
+                            class="absolute right-2 top-2 px-4 py-2 btn-primary rounded-lg text-sm font-medium transition"
+                        >
+                            Search
+                        </button>
+                    </div>
+                    <div id="detectedType" class="mt-3 text-xs text-gray-500 text-center"></div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <button onclick="setSearchType('ip')" class="glass p-4 rounded-xl hover:bg-white/5 transition text-center group">
+                        <div class="text-lg mb-1 opacity-60 group-hover:opacity-100 transition">🌐</div>
+                        <div class="text-xs text-gray-400">IP</div>
+                    </button>
+                    <button onclick="setSearchType('domain')" class="glass p-4 rounded-xl hover:bg-white/5 transition text-center group">
+                        <div class="text-lg mb-1 opacity-60 group-hover:opacity-100 transition">🔗</div>
+                        <div class="text-xs text-gray-400">Domain</div>
+                    </button>
+                    <button onclick="setSearchType('email')" class="glass p-4 rounded-xl hover:bg-white/5 transition text-center group">
+                        <div class="text-lg mb-1 opacity-60 group-hover:opacity-100 transition">📧</div>
+                        <div class="text-xs text-gray-400">Email</div>
+                    </button>
+                    <button onclick="setSearchType('phone')" class="glass p-4 rounded-xl hover:bg-white/5 transition text-center group">
+                        <div class="text-lg mb-1 opacity-60 group-hover:opacity-100 transition">📱</div>
+                        <div class="text-xs text-gray-400">Phone</div>
+                    </button>
+                </div>
+
+                <!-- Results -->
+                <div id="resultsSection" class="hidden">
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-300">Results</h3>
+                            <button onclick="performDeepAnalyze()" class="text-xs text-indigo-400 hover:text-indigo-300 transition">
+                                Deep analyze
+                            </button>
+                        </div>
+                        <div id="resultsContent"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- History Modal -->
+        <div id="historyModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 backdrop-blur-sm">
+            <div class="glass rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[70vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium">History</h3>
+                    <button onclick="closeModal('historyModal')" class="text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="historyContent"></div>
+            </div>
+        </div>
+
+        <!-- Correlations Modal -->
+        <div id="correlationsModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 backdrop-blur-sm">
+            <div class="glass rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[70vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium">Correlations</h3>
+                    <button onclick="closeModal('correlationsModal')" class="text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="correlationsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let sessionId = localStorage.getItem('sessionId') || generateSessionId();
+        localStorage.setItem('sessionId', sessionId);
+        let currentSearchValue = '';
+        let currentSearchType = '';
+
+        function generateSessionId() {
+            return 'session_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function setSearchType(type) {
+            const input = document.getElementById('searchInput');
+            input.placeholder = `Введите ${type}...`;
+            input.focus();
+        }
+
+        async function detectType(input) {
+            try {
+                const response = await fetch(`${API_URL}/detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ input })
+                });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Detection error:', error);
+                return null;
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const value = e.target.value.trim();
+            const detectedDiv = document.getElementById('detectedType');
+            
+            if (value.length > 2) {
+                const detected = await detectType(value);
+                if (detected) {
+                    detectedDiv.textContent = `🧠 Распознано как: ${detected.type.toUpperCase()}`;
+                    currentSearchType = detected.type;
+                }
+            } else {
+                detectedDiv.textContent = '';
+            }
+        });
+
+        async function performSearch() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) return;
+
+            currentSearchValue = input;
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsSection.classList.remove('hidden');
+            resultsContent.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="typing-indicator flex space-x-2">
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                    </div>
+                </div>
+            `;
+
+            const endpoint = getEndpointForType(currentSearchType);
+            
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        [getFieldForType(currentSearchType)]: input,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultsContent.innerHTML = `
+                        <div class="text-red-400 text-center py-4">
+                            ❌ ${data.error}
+                        </div>
+                    `;
+                } else {
+                    displayResults(data);
+                }
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="text-red-400 text-center py-4">
+                        ❌ Ошибка: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function getEndpointForType(type) {
+            const endpoints = {
+                'ip': '/ip',
+                'domain': '/domain',
+                'email': '/email',
+                'phone': '/phone',
+                'username': '/username',
+                'name': '/username',
+                'url': '/domain'
+            };
+            return endpoints[type] || '/analyze';
+        }
+
+        function getFieldForType(type) {
+            const fields = {
+                'ip': 'ip',
+                'domain': 'domain',
+                'email': 'email',
+                'phone': 'phone',
+                'username': 'username',
+                'name': 'username',
+                'url': 'domain'
+            };
+            return fields[type] || 'input';
+        }
+
+        function displayResults(data) {
+            const resultsContent = document.getElementById('resultsContent');
+            let html = '';
+
+            if (data.type === 'ip') {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">🌐</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Country</div>
+                                <div class="text-sm">${data.country || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">City</div>
+                                <div class="text-sm">${data.city || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">ISP</div>
+                                <div class="text-sm">${data.isp || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Organization</div>
+                                <div class="text-sm">${data.org || '—'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'domain') {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">🔗</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">IP</div>
+                                <div class="text-sm">${data.ip || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Registrar</div>
+                                <div class="text-sm">${data.registrar || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Created</div>
+                                <div class="text-sm">${data.created || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Expires</div>
+                                <div class="text-sm">${data.expires || '—'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'email') {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">📧</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Domain</div>
+                                <div class="text-sm">${data.domain || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">MX Valid</div>
+                                <div class="text-sm">${data.mx_valid ? '✓' : '✗'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'phone') {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">📱</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Valid</div>
+                                <div class="text-sm">${data.valid ? '✓' : '✗'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3">
+                                <div class="text-gray-500 text-xs mb-1">Country</div>
+                                <div class="text-sm">${data.country || '—'}</div>
+                            </div>
+                            <div class="input-glass rounded-lg p-3 col-span-2">
+                                <div class="text-gray-500 text-xs mb-1">Carrier</div>
+                                <div class="text-sm">${data.carrier || '—'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'username') {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">👤</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="space-y-2">
+                            ${Object.entries(data.platforms).map(([platform, url]) => `
+                                <a href="${url}" target="_blank" class="block input-glass hover:bg-white/10 rounded-lg p-3 transition">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">${platform}</span>
+                                        <span class="text-indigo-400">→</span>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (data.type && data.type.startsWith('analyze_')) {
+                html = `
+                    <div class="result-card space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400">
+                            <span class="text-xl">🧠</span>
+                            <span class="font-medium">${data.value}</span>
+                        </div>
+                        <div class="space-y-2">
+                            ${data.results.map(r => `
+                                <div class="input-glass rounded-lg p-3">
+                                    <div class="text-gray-500 text-xs mb-1">${r.key}</div>
+                                    <div class="text-sm">${r.value || '—'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${data.correlations.length > 0 ? `
+                            <div class="mt-4">
+                                <div class="text-gray-500 text-xs mb-2">Correlations</div>
+                                ${data.correlations.map(c => `
+                                    <div class="input-glass rounded-lg p-2 text-xs">
+                                        ${c.type}: ${c.value}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            resultsContent.innerHTML = html;
+        }
+
+        async function performDeepAnalyze() {
+            if (!currentSearchValue) return;
+
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="typing-indicator flex space-x-2">
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        input: currentSearchValue,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="text-red-400 text-center py-4">
+                        ❌ Ошибка: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function showHistory() {
+            const modal = document.getElementById('historyModal');
+            const content = document.getElementById('historyContent');
+            
+            content.innerHTML = '<div class="text-center py-4">Загрузка...</div>';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            try {
+                const response = await fetch(`${API_URL}/history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.history && data.history.length > 0) {
+                    content.innerHTML = data.history.map(item => `
+                        <div class="input-glass rounded-lg p-3 mb-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-medium text-indigo-400">${item.type.toUpperCase()}</span>
+                                <span class="text-gray-500 text-xs">${new Date(item.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="text-gray-300 text-sm mt-1">${item.value}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    content.innerHTML = '<div class="text-center py-4 text-gray-500 text-sm">No history</div>';
+                }
+            } catch (error) {
+                content.innerHTML = `<div class="text-red-400 text-center py-4">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function showCorrelations() {
+            const modal = document.getElementById('correlationsModal');
+            const content = document.getElementById('correlationsContent');
+            
+            content.innerHTML = '<div class="text-center py-4">Загрузка...</div>';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            try {
+                const response = await fetch(`${API_URL}/correlations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.correlations && data.correlations.length > 0) {
+                    content.innerHTML = data.correlations.map(c => `
+                        <div class="input-glass rounded-lg p-3 mb-2">
+                            <span class="text-xs font-medium text-indigo-400">${c.type}</span>
+                            <span class="text-gray-300 text-sm">: ${c.value}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    content.innerHTML = '<div class="text-center py-4 text-gray-500 text-sm">No correlations</div>';
+                }
+            } catch (error) {
+                content.innerHTML = `<div class="text-red-400 text-center py-4 text-sm">Error: ${error.message}</div>`;
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.querySelectorAll('[id$="Modal"]').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
