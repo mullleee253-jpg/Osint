@@ -13,112 +13,62 @@
             padding: 0;
         }
         body {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
-            color: white;
-            min-height: 100vh;
+            background: #0a0a0a;
+            color: #e5e5e5;
         }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
         }
-        .glass {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        input {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
         }
-        .input-glass {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .input-glass:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        input:focus {
+            border-color: #444;
             outline: none;
         }
-        .input-glass::placeholder {
-            color: #6b7280;
+        input::placeholder {
+            color: #666;
+        }
+        button {
+            cursor: pointer;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            color: white;
+            background: #333;
+            color: #e5e5e5;
             border: none;
-            cursor: pointer;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            background: #444;
         }
-        .btn-primary:active {
-            transform: translateY(0);
+        .btn-icon {
+            background: transparent;
+            color: #666;
         }
-        .bg-gradient-to-br {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        .btn-icon:hover {
+            color: #e5e5e5;
         }
-        .result-card {
-            animation: slideUp 0.4s ease-out;
+        .btn-quick {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
         }
-        @keyframes slideUp {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-        .typing-indicator span {
-            animation: bounce 1.4s infinite;
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 50%;
-            margin: 0 3px;
-        }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce {
-            0%, 80%, 100% { 
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-            40% { 
-                transform: scale(1.2);
-                opacity: 1;
-            }
+        .btn-quick:hover {
+            background: #222;
         }
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
+            background: #1a1a1a;
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 4px;
+            background: #333;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            background: #444;
         }
         .container {
             max-width: 56rem;
@@ -392,27 +342,22 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-white">
-    <div class="min-h-screen flex flex-col" style="position: relative; z-index: 1;">
+<body>
+    <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="p-6 border-b border-white/5" style="background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);">
+        <header class="p-6 border-b border-gray-800">
             <div class="max-w-4xl mx-auto flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center" style="box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="font-semibold text-xl tracking-tight" style="background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">OSINT</span>
+                    <span class="font-semibold text-xl">OSINT</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="showHistory()" class="p-3 hover:bg-white/5 rounded-xl transition" style="transition: all 0.3s ease;">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onclick="showHistory()" class="p-2 btn-icon rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </button>
-                    <button onclick="showCorrelations()" class="p-3 hover:bg-white/5 rounded-xl transition" style="transition: all 0.3s ease;">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onclick="showCorrelations()" class="p-2 btn-icon rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                         </svg>
                     </button>
@@ -424,68 +369,64 @@
         <main class="flex-1 p-6">
             <div class="max-w-4xl mx-auto">
                 <!-- Search -->
-                <div class="glass rounded-3xl p-8 mb-8" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);">
-                    <div class="relative">
+                <div class="card rounded-lg p-6 mb-6">
+                    <div class="flex gap-2">
                         <input 
                             type="text" 
                             id="searchInput" 
-                            placeholder="IP, domain, email, phone, username..."
-                            class="w-full px-6 py-5 input-glass rounded-2xl text-white placeholder-gray-500 focus:outline-none transition text-base"
+                            placeholder="IP, domain, email, phone..."
+                            class="flex-1 px-4 py-3 rounded"
                             onkeypress="if(event.key === 'Enter') performSearch()"
-                            style="font-size: 1rem;"
                         >
-                        <button 
-                            onclick="performSearch()"
-                            class="absolute right-3 top-3 btn-primary rounded-xl text-sm font-medium transition"
-                        >
+                        <button onclick="performSearch()" class="btn-primary px-6 py-3 rounded">
                             Search
                         </button>
                     </div>
-                    <div id="detectedType" class="mt-4 text-xs text-gray-500 text-center" style="font-weight: 500;"></div>
+                    <div id="detectedType" class="mt-2 text-xs text-gray-500"></div>
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="grid grid-cols-4 gap-4 mb-8">
-                    <button onclick="setSearchType('ip')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">🌐</div>
-                        <div class="text-xs text-gray-400 font-medium">IP</div>
+                <div class="grid grid-cols-4 gap-2 mb-6">
+                    <button onclick="setSearchType('ip')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">🌐</div>
+                        <div class="text-xs">IP</div>
                     </button>
-                    <button onclick="setSearchType('domain')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">🔗</div>
-                        <div class="text-xs text-gray-400 font-medium">Domain</div>
+                    <button onclick="setSearchType('domain')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">🔗</div>
+                        <div class="text-xs">Domain</div>
                     </button>
-                    <button onclick="setSearchType('email')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">📧</div>
-                        <div class="text-xs text-gray-400 font-medium">Email</div>
+                    <button onclick="setSearchType('email')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">📧</div>
+                        <div class="text-xs">Email</div>
                     </button>
-                    <button onclick="setSearchType('phone')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">📱</div>
-                        <div class="text-xs text-gray-400 font-medium">Phone</div>
+                    <button onclick="setSearchType('phone')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">📱</div>
+                        <div class="text-xs">Phone</div>
                     </button>
-                    <button onclick="setSearchType('mac')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">🔌</div>
-                        <div class="text-xs text-gray-400 font-medium">MAC</div>
+                    <button onclick="setSearchType('mac')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">🔌</div>
+                        <div class="text-xs">MAC</div>
                     </button>
-                    <button onclick="setSearchType('hash')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">🔐</div>
-                        <div class="text-xs text-gray-400 font-medium">Hash</div>
+                    <button onclick="setSearchType('hash')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">🔐</div>
+                        <div class="text-xs">Hash</div>
                     </button>
-                    <button onclick="setSearchType('ssl')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">🔒</div>
-                        <div class="text-xs text-gray-400 font-medium">SSL</div>
+                    <button onclick="setSearchType('ssl')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">🔒</div>
+                        <div class="text-xs">SSL</div>
                     </button>
-                    <button onclick="setSearchType('dns-full')" class="glass p-5 rounded-2xl hover:bg-white/10 transition text-center group" style="transition: all 0.3s ease;">
-                        <div class="text-2xl mb-2 opacity-60 group-hover:opacity-100 transition" style="transition: all 0.3s ease;">📡</div>
-                        <div class="text-xs text-gray-400 font-medium">DNS</div>
+                    <button onclick="setSearchType('dns-full')" class="btn-quick p-3 rounded text-center">
+                        <div class="text-lg mb-1">📡</div>
+                        <div class="text-xs">DNS</div>
                     </button>
                 </div>
 
                 <!-- Results -->
                 <div id="resultsSection" class="hidden">
-                    <div class="glass rounded-3xl p-8" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%);">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-base font-medium text-gray-200" style="font-weight: 600;">Results</h3>
-                            <button onclick="performDeepAnalyze()" class="text-xs text-indigo-400 hover:text-indigo-300 transition px-4 py-2 rounded-xl hover:bg-white/5" style="transition: all 0.3s ease;">
+                    <div class="card rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">Results</h3>
+                            <button onclick="performDeepAnalyze()" class="text-xs text-gray-400 hover:text-white">
                                 Deep analyze
                             </button>
                         </div>
@@ -496,12 +437,12 @@
         </main>
 
         <!-- History Modal -->
-        <div id="historyModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 backdrop-blur-sm">
-            <div class="glass rounded-3xl p-8 max-w-lg w-full mx-4 max-h-70vh overflow-y-auto" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-base font-medium" style="font-weight: 600;">History</h3>
-                    <button onclick="closeModal('historyModal')" class="p-2 hover:bg-white/10 rounded-xl transition" style="transition: all 0.3s ease;">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div id="historyModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+            <div class="card rounded-lg p-6 max-w-lg w-full mx-4 max-h-70vh overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">History</h3>
+                    <button onclick="closeModal('historyModal')" class="p-2 btn-icon rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
@@ -511,12 +452,12 @@
         </div>
 
         <!-- Correlations Modal -->
-        <div id="correlationsModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 backdrop-blur-sm">
-            <div class="glass rounded-3xl p-8 max-w-lg w-full mx-4 max-h-70vh overflow-y-auto" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-base font-medium" style="font-weight: 600;">Correlations</h3>
-                    <button onclick="closeModal('correlationsModal')" class="p-2 hover:bg-white/10 rounded-xl transition" style="transition: all 0.3s ease;">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div id="correlationsModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+            <div class="card rounded-lg p-6 max-w-lg w-full mx-4 max-h-70vh overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">Correlations</h3>
+                    <button onclick="closeModal('correlationsModal')" class="p-2 btn-icon rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
@@ -668,114 +609,96 @@
 
             if (data.type === 'ip') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🌐</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Country</div>
-                                <div class="text-sm">${data.country || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Country</div>
+                                <div>${data.country || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">City</div>
-                                <div class="text-sm">${data.city || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">City</div>
+                                <div>${data.city || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">ISP</div>
-                                <div class="text-sm">${data.isp || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">ISP</div>
+                                <div>${data.isp || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Organization</div>
-                                <div class="text-sm">${data.org || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Organization</div>
+                                <div>${data.org || '—'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'domain') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🔗</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">IP</div>
-                                <div class="text-sm">${data.ip || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">IP</div>
+                                <div>${data.ip || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Registrar</div>
-                                <div class="text-sm">${data.registrar || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Registrar</div>
+                                <div>${data.registrar || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Created</div>
-                                <div class="text-sm">${data.created || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Created</div>
+                                <div>${data.created || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Expires</div>
-                                <div class="text-sm">${data.expires || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Expires</div>
+                                <div>${data.expires || '—'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'email') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">📧</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Domain</div>
-                                <div class="text-sm">${data.domain || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Domain</div>
+                                <div>${data.domain || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">MX Valid</div>
-                                <div class="text-sm">${data.mx_valid ? '✓' : '✗'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">MX Valid</div>
+                                <div>${data.mx_valid ? 'Yes' : 'No'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'phone') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">📱</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Valid</div>
-                                <div class="text-sm">${data.valid ? '✓' : '✗'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Valid</div>
+                                <div>${data.valid ? 'Yes' : 'No'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Country</div>
-                                <div class="text-sm">${data.country || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Country</div>
+                                <div>${data.country || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3 col-span-2">
-                                <div class="text-gray-500 text-xs mb-1">Carrier</div>
-                                <div class="text-sm">${data.carrier || '—'}</div>
+                            <div class="card p-2 rounded col-span-2">
+                                <div class="text-gray-500 text-xs">Carrier</div>
+                                <div>${data.carrier || '—'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'username') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">👤</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="space-y-2">
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="space-y-1">
                             ${Object.entries(data.platforms).map(([platform, url]) => `
-                                <a href="${url}" target="_blank" class="block input-glass hover:bg-white/10 rounded-lg p-3 transition">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm">${platform}</span>
-                                        <span class="text-indigo-400">→</span>
-                                    </div>
+                                <a href="${url}" target="_blank" class="block card p-2 rounded text-sm hover:bg-gray-800">
+                                    ${platform}
                                 </a>
                             `).join('')}
                         </div>
@@ -783,66 +706,57 @@
                 `;
             } else if (data.type === 'mac') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🔌</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Vendor</div>
-                                <div class="text-sm">${data.vendor || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Vendor</div>
+                                <div>${data.vendor || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Normalized</div>
-                                <div class="text-sm">${data.normalized || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Normalized</div>
+                                <div>${data.normalized || '—'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'hash') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🔐</span>
-                            <span class="font-medium">${data.value.substring(0, 16)}...</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Type</div>
-                                <div class="text-sm">${data.hash_type || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value.substring(0, 16)}...</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Type</div>
+                                <div>${data.hash_type || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3 col-span-2">
-                                <div class="text-gray-500 text-xs mb-1">Note</div>
-                                <div class="text-sm">${data.note || '—'}</div>
+                            <div class="card p-2 rounded col-span-2">
+                                <div class="text-gray-500 text-xs">Note</div>
+                                <div>${data.note || '—'}</div>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (data.type === 'ssl') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🔒</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Subject</div>
-                                <div class="text-sm">${JSON.stringify(data.subject) || '—'}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="space-y-1 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Subject</div>
+                                <div>${JSON.stringify(data.subject) || '—'}</div>
                             </div>
-                            <div class="input-glass rounded-lg p-3">
-                                <div class="text-gray-500 text-xs mb-1">Issuer</div>
-                                <div class="text-sm">${JSON.stringify(data.issuer) || '—'}</div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Issuer</div>
+                                <div>${JSON.stringify(data.issuer) || '—'}</div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
-                                <div class="input-glass rounded-lg p-3">
-                                    <div class="text-gray-500 text-xs mb-1">Valid From</div>
-                                    <div class="text-sm">${data.not_before || '—'}</div>
+                                <div class="card p-2 rounded">
+                                    <div class="text-gray-500 text-xs">Valid From</div>
+                                    <div>${data.not_before || '—'}</div>
                                 </div>
-                                <div class="input-glass rounded-lg p-3">
-                                    <div class="text-gray-500 text-xs mb-1">Valid To</div>
-                                    <div class="text-sm">${data.not_after || '—'}</div>
+                                <div class="card p-2 rounded">
+                                    <div class="text-gray-500 text-xs">Valid To</div>
+                                    <div>${data.not_after || '—'}</div>
                                 </div>
                             </div>
                         </div>
@@ -850,16 +764,13 @@
                 `;
             } else if (data.type === 'dns-full') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">📡</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="space-y-2">
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="space-y-1 text-sm">
                             ${Object.entries(data.records).map(([type, records]) => `
-                                <div class="input-glass rounded-lg p-3">
-                                    <div class="text-gray-500 text-xs mb-1">${type}</div>
-                                    <div class="text-sm">${records.length > 0 ? records.join(', ') : '—'}</div>
+                                <div class="card p-2 rounded">
+                                    <div class="text-gray-500 text-xs">${type}</div>
+                                    <div>${records.length > 0 ? records.join(', ') : '—'}</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -867,20 +778,17 @@
                 `;
             } else if (data.type === 'http-headers') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🌐</span>
-                            <span class="font-medium">${data.value}</span>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="card p-2 rounded text-sm">
+                            <div class="text-gray-500 text-xs">Status Code</div>
+                            <div>${data.status_code || '—'}</div>
                         </div>
-                        <div class="input-glass rounded-lg p-3">
-                            <div class="text-gray-500 text-xs mb-1">Status Code</div>
-                            <div class="text-sm">${data.status_code || '—'}</div>
-                        </div>
-                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                        <div class="space-y-1 max-h-60 overflow-y-auto text-sm">
                             ${Object.entries(data.headers).map(([key, value]) => `
-                                <div class="input-glass rounded-lg p-2">
+                                <div class="card p-2 rounded">
                                     <div class="text-gray-500 text-xs">${key}</div>
-                                    <div class="text-xs text-gray-300">${value}</div>
+                                    <div class="text-gray-400">${value}</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -888,20 +796,17 @@
                 `;
             } else if (data.type === 'wayback') {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">📜</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="input-glass rounded-lg p-3">
-                            <div class="text-gray-500 text-xs mb-1">Total Snapshots</div>
-                            <div class="text-sm">${data.total || 0}</div>
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="card p-2 rounded text-sm">
+                            <div class="text-gray-500 text-xs">Total Snapshots</div>
+                            <div>${data.total || 0}</div>
                         </div>
                         ${data.snapshots && data.snapshots.length > 0 ? `
-                            <div class="space-y-2">
+                            <div class="space-y-1 text-sm">
                                 ${data.snapshots.slice(0, 5).map(snap => `
-                                    <div class="input-glass rounded-lg p-2">
-                                        <div class="text-xs text-gray-300">${snap[1] || '—'}</div>
+                                    <div class="card p-2 rounded">
+                                        <div>${snap[1] || '—'}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -910,24 +815,21 @@
                 `;
             } else if (data.type && data.type.startsWith('analyze_')) {
                 html = `
-                    <div class="result-card space-y-3">
-                        <div class="flex items-center space-x-2 text-indigo-400">
-                            <span class="text-xl">🧠</span>
-                            <span class="font-medium">${data.value}</span>
-                        </div>
-                        <div class="space-y-2">
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="space-y-1 text-sm">
                             ${data.results.map(r => `
-                                <div class="input-glass rounded-lg p-3">
-                                    <div class="text-gray-500 text-xs mb-1">${r.key}</div>
-                                    <div class="text-sm">${r.value || '—'}</div>
+                                <div class="card p-2 rounded">
+                                    <div class="text-gray-500 text-xs">${r.key}</div>
+                                    <div>${r.value || '—'}</div>
                                 </div>
                             `).join('')}
                         </div>
                         ${data.correlations.length > 0 ? `
-                            <div class="mt-4">
-                                <div class="text-gray-500 text-xs mb-2">Correlations</div>
+                            <div class="mt-2">
+                                <div class="text-gray-500 text-xs mb-1">Correlations</div>
                                 ${data.correlations.map(c => `
-                                    <div class="input-glass rounded-lg p-2 text-xs">
+                                    <div class="card p-2 rounded text-xs">
                                         ${c.type}: ${c.value}
                                     </div>
                                 `).join('')}
