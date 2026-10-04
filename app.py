@@ -14,6 +14,7 @@ from collections import defaultdict
 import asyncio
 import aiohttp
 import subprocess
+import json
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -627,6 +628,209 @@ def lookup_wayback():
         }
         
         add_to_history(session_id, 'wayback', url, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/reverse-ip', methods=['POST'])
+def reverse_ip_lookup():
+    data = request.json
+    ip_address = data.get('ip')
+    session_id = data.get('session_id', 'default')
+    
+    if not ip_address:
+        return jsonify({'error': 'IP address required'}), 400
+    
+    try:
+        # Use viewdns.info API for reverse IP lookup
+        response = requests.get(f'https://viewdns.info/reverseip/?host={ip_address}&apikey=your_api_key')
+        
+        if response.status_code == 200:
+            domains = []
+            # Parse response (simplified)
+            lines = response.text.split('\n')
+            for line in lines:
+                if line.strip():
+                    domains.append(line.strip())
+        else:
+            domains = []
+        
+        formatted = {
+            'type': 'reverse-ip',
+            'value': ip_address,
+            'domains': domains[:10],
+            'total': len(domains)
+        }
+        
+        add_to_history(session_id, 'reverse-ip', ip_address, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/subdomains', methods=['POST'])
+def subdomain_enumeration():
+    data = request.json
+    domain = data.get('domain')
+    session_id = data.get('session_id', 'default')
+    
+    if not domain:
+        return jsonify({'error': 'Domain required'}), 400
+    
+    try:
+        subdomains = []
+        
+        # Common subdomain wordlist
+        common_subdomains = ['www', 'mail', 'ftp', 'admin', 'api', 'dev', 'staging', 'test', 'blog', 'shop', 'cdn', 'static', 'app', 'portal', 'secure', 'vpn', 'remote', 'webmail', 'email']
+        
+        for sub in common_subdomains:
+            try:
+                full_domain = f'{sub}.{domain}'
+                socket.gethostbyname(full_domain)
+                subdomains.append(full_domain)
+            except socket.gaierror:
+                pass
+        
+        formatted = {
+            'type': 'subdomains',
+            'value': domain,
+            'subdomains': subdomains,
+            'total': len(subdomains)
+        }
+        
+        add_to_history(session_id, 'subdomains', domain, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ports', methods=['POST'])
+def port_scan():
+    data = request.json
+    target = data.get('target')
+    session_id = data.get('session_id', 'default')
+    
+    if not target:
+        return jsonify({'error': 'Target required'}), 400
+    
+    try:
+        common_ports = [21, 22, 23, 25, 53, 80, 110, 143, 443, 993, 995, 3306, 3389, 5432, 5900, 8080, 8443]
+        open_ports = []
+        
+        for port in common_ports:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                result = sock.connect_ex((target, port))
+                if result == 0:
+                    open_ports.append(port)
+                sock.close()
+            except:
+                pass
+        
+        formatted = {
+            'type': 'ports',
+            'value': target,
+            'open_ports': open_ports,
+            'total': len(open_ports)
+        }
+        
+        add_to_history(session_id, 'ports', target, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/asn', methods=['POST'])
+def asn_lookup():
+    data = request.json
+    ip_address = data.get('ip')
+    session_id = data.get('session_id', 'default')
+    
+    if not ip_address:
+        return jsonify({'error': 'IP address required'}), 400
+    
+    try:
+        # Use ip-api.com for ASN info
+        response = requests.get(f'http://ip-api.com/json/{ip_address}')
+        
+        if response.status_code == 200:
+            data_json = response.json()
+            formatted = {
+                'type': 'asn',
+                'value': ip_address,
+                'asn': data_json.get('as', '—'),
+                'isp': data_json.get('isp', '—'),
+                'org': data_json.get('org', '—'),
+                'country': data_json.get('country', '—')
+            }
+        else:
+            formatted = {
+                'type': 'asn',
+                'value': ip_address,
+                'asn': '—',
+                'isp': '—',
+                'org': '—',
+                'country': '—'
+            }
+        
+        add_to_history(session_id, 'asn', ip_address, formatted)
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/user-agent', methods=['POST'])
+def analyze_user_agent():
+    data = request.json
+    user_agent = data.get('user_agent')
+    session_id = data.get('session_id', 'default')
+    
+    if not user_agent:
+        return jsonify({'error': 'User agent required'}), 400
+    
+    try:
+        # Parse user agent
+        browser = 'Unknown'
+        os = 'Unknown'
+        device = 'Unknown'
+        
+        ua_lower = user_agent.lower()
+        
+        if 'chrome' in ua_lower:
+            browser = 'Chrome'
+        elif 'firefox' in ua_lower:
+            browser = 'Firefox'
+        elif 'safari' in ua_lower and 'chrome' not in ua_lower:
+            browser = 'Safari'
+        elif 'edge' in ua_lower:
+            browser = 'Edge'
+        elif 'opera' in ua_lower:
+            browser = 'Opera'
+        
+        if 'windows' in ua_lower:
+            os = 'Windows'
+        elif 'mac' in ua_lower:
+            os = 'macOS'
+        elif 'linux' in ua_lower:
+            os = 'Linux'
+        elif 'android' in ua_lower:
+            os = 'Android'
+        elif 'ios' in ua_lower or 'iphone' in ua_lower or 'ipad' in ua_lower:
+            os = 'iOS'
+        
+        if 'mobile' in ua_lower or 'android' in ua_lower or 'iphone' in ua_lower:
+            device = 'Mobile'
+        elif 'tablet' in ua_lower or 'ipad' in ua_lower:
+            device = 'Tablet'
+        else:
+            device = 'Desktop'
+        
+        formatted = {
+            'type': 'user-agent',
+            'value': user_agent,
+            'browser': browser,
+            'os': os,
+            'device': device
+        }
+        
+        add_to_history(session_id, 'user-agent', user_agent, formatted)
         return jsonify(formatted)
     except Exception as e:
         return jsonify({'error': str(e)}), 500

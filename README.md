@@ -1,108 +1,90 @@
-# OSINT Intelligence Platform
+# OSINT Web Platform
 
-Современная веб-платформа для OSINT-разведки с интеллектуальным анализом данных.
+Максимальная версия веб-платформы для OSINT (Open Source Intelligence) исследований с умным определением типа ввода, кэшированием, историей поиска и корреляцией данных.
 
-## 🚀 Возможности
+## Возможности
 
-### Базовые функции
-- **IP Lookup** - Геолокация, ISP, организация
-- **Domain Lookup** - IP, регистратор, даты регистрации
-- **WHOIS** - Полная WHOIS информация
-- **DNS Lookup** - DNS записи домена
-- **Email Check** - Проверка валидности email
-- **Phone Lookup** - Информация о номере телефона
-- **Username Search** - Поиск в социальных сетях
+### Умная система
+- **Автоопределение типа ввода** - автоматически распознает IP, домен, email, телефон, username, MAC, hash
+- **Кэширование** - результаты кэшируются на 30 минут для быстрого доступа
+- **История поиска** - сохраняет историю по сессиям
+- **Корреляция данных** - связывает связанные данные между собой
+- **Глубокий анализ** - выполняет комплексный анализ с предложениями
 
-### Умные функции
-- 🧠 **Автоматическое определение типа** - система сама распознает что вы ищете
-- ⚡ **Кэширование** - результаты сохраняются на 30 минут
-- 📜 **История поиска** - сохранение последних 20 поисков
-- 🔗 **Корреляция данных** - автоматическое нахождение связей
-- 🧠 **Глубокий анализ** - многоуровневый анализ с корреляцией
+### Вкладки
 
-## 📋 Требования
+#### Basic
+- **IP Lookup** - геолокация, ISP, организация
+- **Domain Lookup** - WHOIS информация, IP, регистратор
+- **Email Check** - проверка MX записей
+- **Phone Lookup** - валидация, страна, оператор
 
-- Python 3.8+
-- pip
+#### Network
+- **Reverse IP** - поиск доменов на одном IP
+- **Subdomains** - перечисление поддоменов
+- **Port Scanning** - сканирование открытых портов
+- **ASN Lookup** - информация о автономной системе
 
-## 🔧 Установка
+#### Advanced
+- **SSL/TLS Certificate** - информация о сертификате
+- **DNS Full** - полные DNS записи (A, MX, TXT, NS, CNAME)
+- **HTTP Headers** - анализ заголовков
+- **Wayback Machine** - архивированные версии сайтов
+
+#### Tools
+- **MAC Address** - поиск производителя
+- **Hash Analysis** - определение типа хеша
+- **User Agent** - анализ браузера, ОС, устройства
+- **Username Search** - поиск по социальным сетям
+
+## Установка
 
 1. Установите зависимости:
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🎯 Запуск
-
-Запустите Flask сервер:
+2. Запустите сервер:
 ```bash
 python app.py
 ```
 
-Сервер запустится на `http://localhost:5000`
-
-Откройте `index.html` в браузере или используйте:
-```bash
-start index.html
+3. Откройте в браузере:
+```
+http://localhost:5000
 ```
 
-## 📝 API Эндпоинты
+## API Эндпоинты
 
-### POST /api/ip
-```json
-{
-  "ip": "8.8.8.8",
-  "session_id": "session_abc123"
-}
-```
+### Basic
+- `POST /api/ip` - IP поиск
+- `POST /api/domain` - Domain поиск
+- `POST /api/email` - Email проверка
+- `POST /api/phone` - Phone поиск
+- `POST /api/username` - Username поиск
 
-### POST /api/domain
-```json
-{
-  "domain": "google.com",
-  "session_id": "session_abc123"
-}
-```
+### Network
+- `POST /api/reverse-ip` - Reverse IP lookup
+- `POST /api/subdomains` - Subdomain enumeration
+- `POST /api/ports` - Port scanning
+- `POST /api/asn` - ASN lookup
 
-### POST /api/whois
-```json
-{
-  "domain": "example.com",
-  "session_id": "session_abc123"
-}
-```
+### Advanced
+- `POST /api/ssl` - SSL сертификат
+- `POST /api/dns-full` - Полные DNS записи
+- `POST /api/http-headers` - HTTP заголовки
+- `POST /api/wayback` - Wayback Machine
 
-### POST /api/dns
-```json
-{
-  "domain": "google.com",
-  "session_id": "session_abc123"
-}
-```
+### Tools
+- `POST /api/mac` - MAC адрес
+- `POST /api/hash` - Hash анализ
+- `POST /api/user-agent` - User Agent анализ
 
-### POST /api/email
-```json
-{
-  "email": "test@example.com",
-  "session_id": "session_abc123"
-}
-```
-
-### POST /api/phone
-```json
-{
-  "phone": "+79001234567",
-  "session_id": "session_abc123"
-}
-```
-
-### POST /api/username
-```json
-{
-  "username": "testuser",
-  "session_id": "session_abc123"
-}
-```
+### Умные функции
+- `POST /api/detect` - Определение типа ввода
+- `POST /api/analyze` - Глубокий анализ
+- `GET /api/history?session_id=xxx` - История
+- `GET /api/correlations?session_id=xxx` - Корреляции
 
 ### POST /api/analyze
 ```json

@@ -13,62 +13,83 @@
             padding: 0;
         }
         body {
-            background: #0a0a0a;
-            color: #e5e5e5;
+            background: #000000;
+            color: #ffffff;
         }
         .card {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
+            background: #111111;
+            border: 1px solid #333333;
         }
         input {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            color: #e5e5e5;
+            background: #111111;
+            border: 1px solid #333333;
+            color: #ffffff;
         }
         input:focus {
-            border-color: #444;
+            border-color: #555555;
             outline: none;
         }
         input::placeholder {
-            color: #666;
+            color: #666666;
         }
         button {
             cursor: pointer;
         }
         .btn-primary {
-            background: #333;
-            color: #e5e5e5;
-            border: none;
+            background: #222222;
+            color: #ffffff;
+            border: 1px solid #333333;
         }
         .btn-primary:hover {
-            background: #444;
+            background: #333333;
         }
         .btn-icon {
             background: transparent;
-            color: #666;
+            color: #666666;
         }
         .btn-icon:hover {
-            color: #e5e5e5;
+            color: #ffffff;
         }
         .btn-quick {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            color: #e5e5e5;
+            background: #111111;
+            border: 1px solid #333333;
+            color: #ffffff;
         }
         .btn-quick:hover {
-            background: #222;
+            background: #222222;
+        }
+        .btn-tab {
+            background: #111111;
+            border: 1px solid #333333;
+            color: #666666;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        .btn-tab.active {
+            background: #222222;
+            color: #ffffff;
+            border-color: #555555;
+        }
+        .btn-tab:hover {
+            background: #222222;
         }
         ::-webkit-scrollbar {
             width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: #111111;
         }
         ::-webkit-scrollbar-thumb {
-            background: #333;
+            background: #333333;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #444;
+            background: #444444;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         .container {
             max-width: 56rem;
@@ -368,57 +389,158 @@
         <!-- Main Content -->
         <main class="flex-1 p-6">
             <div class="max-w-4xl mx-auto">
-                <!-- Search -->
-                <div class="card rounded-lg p-6 mb-6">
-                    <div class="flex gap-2">
-                        <input 
-                            type="text" 
-                            id="searchInput" 
-                            placeholder="IP, domain, email, phone..."
-                            class="flex-1 px-4 py-3 rounded"
-                            onkeypress="if(event.key === 'Enter') performSearch()"
-                        >
-                        <button onclick="performSearch()" class="btn-primary px-6 py-3 rounded">
-                            Search
-                        </button>
-                    </div>
-                    <div id="detectedType" class="mt-2 text-xs text-gray-500"></div>
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-6 flex-wrap">
+                    <button onclick="switchTab('basic')" class="btn-tab active" data-tab="basic">Basic</button>
+                    <button onclick="switchTab('network')" class="btn-tab" data-tab="network">Network</button>
+                    <button onclick="switchTab('advanced')" class="btn-tab" data-tab="advanced">Advanced</button>
+                    <button onclick="switchTab('tools')" class="btn-tab" data-tab="tools">Tools</button>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="grid grid-cols-4 gap-2 mb-6">
-                    <button onclick="setSearchType('ip')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">🌐</div>
-                        <div class="text-xs">IP</div>
-                    </button>
-                    <button onclick="setSearchType('domain')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">🔗</div>
-                        <div class="text-xs">Domain</div>
-                    </button>
-                    <button onclick="setSearchType('email')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">📧</div>
-                        <div class="text-xs">Email</div>
-                    </button>
-                    <button onclick="setSearchType('phone')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">📱</div>
-                        <div class="text-xs">Phone</div>
-                    </button>
-                    <button onclick="setSearchType('mac')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">🔌</div>
-                        <div class="text-xs">MAC</div>
-                    </button>
-                    <button onclick="setSearchType('hash')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">🔐</div>
-                        <div class="text-xs">Hash</div>
-                    </button>
-                    <button onclick="setSearchType('ssl')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">🔒</div>
-                        <div class="text-xs">SSL</div>
-                    </button>
-                    <button onclick="setSearchType('dns-full')" class="btn-quick p-3 rounded text-center">
-                        <div class="text-lg mb-1">📡</div>
-                        <div class="text-xs">DNS</div>
-                    </button>
+                <!-- Basic Tab -->
+                <div id="tab-basic" class="tab-content active">
+                    <div class="card rounded-lg p-6 mb-6">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                placeholder="IP, domain, email, phone..."
+                                class="flex-1 px-4 py-3 rounded"
+                                onkeypress="if(event.key === 'Enter') performSearch()"
+                            >
+                            <button onclick="performSearch()" class="btn-primary px-6 py-3 rounded">
+                                Search
+                            </button>
+                        </div>
+                        <div id="detectedType" class="mt-2 text-xs text-gray-500"></div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 mb-6">
+                        <button onclick="setSearchType('ip')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🌐</div>
+                            <div class="text-xs">IP</div>
+                        </button>
+                        <button onclick="setSearchType('domain')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🔗</div>
+                            <div class="text-xs">Domain</div>
+                        </button>
+                        <button onclick="setSearchType('email')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">📧</div>
+                            <div class="text-xs">Email</div>
+                        </button>
+                        <button onclick="setSearchType('phone')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">📱</div>
+                            <div class="text-xs">Phone</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Network Tab -->
+                <div id="tab-network" class="tab-content">
+                    <div class="card rounded-lg p-6 mb-6">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="networkInput" 
+                                placeholder="IP or domain..."
+                                class="flex-1 px-4 py-3 rounded"
+                            >
+                            <button onclick="performNetworkSearch()" class="btn-primary px-6 py-3 rounded">
+                                Scan
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 mb-6">
+                        <button onclick="setNetworkType('reverse-ip')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🔄</div>
+                            <div class="text-xs">Reverse IP</div>
+                        </button>
+                        <button onclick="setNetworkType('subdomains')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🌍</div>
+                            <div class="text-xs">Subdomains</div>
+                        </button>
+                        <button onclick="setNetworkType('ports')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🔌</div>
+                            <div class="text-xs">Ports</div>
+                        </button>
+                        <button onclick="setNetworkType('asn')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">📡</div>
+                            <div class="text-xs">ASN</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Tab -->
+                <div id="tab-advanced" class="tab-content">
+                    <div class="card rounded-lg p-6 mb-6">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="advancedInput" 
+                                placeholder="Domain or URL..."
+                                class="flex-1 px-4 py-3 rounded"
+                            >
+                            <button onclick="performAdvancedSearch()" class="btn-primary px-6 py-3 rounded">
+                                Analyze
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 mb-6">
+                        <button onclick="setAdvancedType('ssl')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🔒</div>
+                            <div class="text-xs">SSL</div>
+                        </button>
+                        <button onclick="setAdvancedType('dns-full')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">📡</div>
+                            <div class="text-xs">DNS Full</div>
+                        </button>
+                        <button onclick="setAdvancedType('http-headers')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🌐</div>
+                            <div class="text-xs">Headers</div>
+                        </button>
+                        <button onclick="setAdvancedType('wayback')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">📜</div>
+                            <div class="text-xs">Wayback</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tools Tab -->
+                <div id="tab-tools" class="tab-content">
+                    <div class="card rounded-lg p-6 mb-6">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="toolsInput" 
+                                placeholder="MAC, hash, or user agent..."
+                                class="flex-1 px-4 py-3 rounded"
+                            >
+                            <button onclick="performToolsSearch()" class="btn-primary px-6 py-3 rounded">
+                                Analyze
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 mb-6">
+                        <button onclick="setToolsType('mac')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">�</div>
+                            <div class="text-xs">MAC</div>
+                        </button>
+                        <button onclick="setToolsType('hash')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🔐</div>
+                            <div class="text-xs">Hash</div>
+                        </button>
+                        <button onclick="setToolsType('user-agent')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">🖥️</div>
+                            <div class="text-xs">User Agent</div>
+                        </button>
+                        <button onclick="setToolsType('username')" class="btn-quick p-3 rounded text-center">
+                            <div class="text-lg mb-1">�</div>
+                            <div class="text-xs">Username</div>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Results -->
@@ -579,7 +701,12 @@
                 'ssl': '/ssl',
                 'dns-full': '/dns-full',
                 'http-headers': '/http-headers',
-                'wayback': '/wayback'
+                'wayback': '/wayback',
+                'reverse-ip': '/reverse-ip',
+                'subdomains': '/subdomains',
+                'ports': '/ports',
+                'asn': '/asn',
+                'user-agent': '/user-agent'
             };
             return endpoints[type] || '/analyze';
         }
@@ -598,9 +725,120 @@
                 'ssl': 'domain',
                 'dns-full': 'domain',
                 'http-headers': 'url',
-                'wayback': 'url'
+                'wayback': 'url',
+                'reverse-ip': 'ip',
+                'subdomains': 'domain',
+                'ports': 'target',
+                'asn': 'ip',
+                'user-agent': 'user_agent'
             };
             return fields[type] || 'input';
+        }
+
+        let currentNetworkType = 'reverse-ip';
+        let currentAdvancedType = 'ssl';
+        let currentToolsType = 'mac';
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.btn-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        function setNetworkType(type) {
+            currentNetworkType = type;
+        }
+
+        function setAdvancedType(type) {
+            currentAdvancedType = type;
+        }
+
+        function setToolsType(type) {
+            currentToolsType = type;
+        }
+
+        function performNetworkSearch() {
+            const input = document.getElementById('networkInput').value;
+            if (!input) return;
+            
+            currentSearchValue = input;
+            currentSearchType = currentNetworkType;
+            
+            const endpoint = getEndpointForType(currentNetworkType);
+            const field = getFieldForType(currentNetworkType);
+            
+            fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [field]: input, session_id: sessionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('resultsSection').classList.remove('hidden');
+                displayResults(data);
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error performing search');
+            });
+        }
+
+        function performAdvancedSearch() {
+            const input = document.getElementById('advancedInput').value;
+            if (!input) return;
+            
+            currentSearchValue = input;
+            currentSearchType = currentAdvancedType;
+            
+            const endpoint = getEndpointForType(currentAdvancedType);
+            const field = getFieldForType(currentAdvancedType);
+            
+            fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [field]: input, session_id: sessionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('resultsSection').classList.remove('hidden');
+                displayResults(data);
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error performing search');
+            });
+        }
+
+        function performToolsSearch() {
+            const input = document.getElementById('toolsInput').value;
+            if (!input) return;
+            
+            currentSearchValue = input;
+            currentSearchType = currentToolsType;
+            
+            const endpoint = getEndpointForType(currentToolsType);
+            const field = getFieldForType(currentToolsType);
+            
+            fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [field]: input, session_id: sessionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('resultsSection').classList.remove('hidden');
+                displayResults(data);
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error performing search');
+            });
         }
 
         function displayResults(data) {
@@ -811,6 +1049,103 @@
                                 `).join('')}
                             </div>
                         ` : '<div class="text-gray-500 text-sm">No snapshots found</div>'}
+                    </div>
+                `;
+            } else if (data.type === 'reverse-ip') {
+                html = `
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="card p-2 rounded text-sm">
+                            <div class="text-gray-500 text-xs">Total Domains</div>
+                            <div>${data.total || 0}</div>
+                        </div>
+                        ${data.domains && data.domains.length > 0 ? `
+                            <div class="space-y-1 text-sm">
+                                ${data.domains.slice(0, 10).map(domain => `
+                                    <div class="card p-2 rounded">
+                                        <div>${domain}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div class="text-gray-500 text-sm">No domains found</div>'}
+                    </div>
+                `;
+            } else if (data.type === 'subdomains') {
+                html = `
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="card p-2 rounded text-sm">
+                            <div class="text-gray-500 text-xs">Total Subdomains</div>
+                            <div>${data.total || 0}</div>
+                        </div>
+                        ${data.subdomains && data.subdomains.length > 0 ? `
+                            <div class="space-y-1 text-sm">
+                                ${data.subdomains.map(sub => `
+                                    <div class="card p-2 rounded">
+                                        <div>${sub}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div class="text-gray-500 text-sm">No subdomains found</div>'}
+                    </div>
+                `;
+            } else if (data.type === 'ports') {
+                html = `
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="card p-2 rounded text-sm">
+                            <div class="text-gray-500 text-xs">Open Ports</div>
+                            <div>${data.total || 0}</div>
+                        </div>
+                        ${data.open_ports && data.open_ports.length > 0 ? `
+                            <div class="card p-2 rounded text-sm">
+                                <div>${data.open_ports.join(', ')}</div>
+                            </div>
+                        ` : '<div class="text-gray-500 text-sm">No open ports found</div>'}
+                    </div>
+                `;
+            } else if (data.type === 'asn') {
+                html = `
+                    <div class="space-y-2">
+                        <div class="font-medium">${data.value}</div>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">ASN</div>
+                                <div>${data.asn || '—'}</div>
+                            </div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">ISP</div>
+                                <div>${data.isp || '—'}</div>
+                            </div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Organization</div>
+                                <div>${data.org || '—'}</div>
+                            </div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Country</div>
+                                <div>${data.country || '—'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (data.type === 'user-agent') {
+                html = `
+                    <div class="space-y-2">
+                        <div class="font-medium text-xs">${data.value.substring(0, 50)}...</div>
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Browser</div>
+                                <div>${data.browser || '—'}</div>
+                            </div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">OS</div>
+                                <div>${data.os || '—'}</div>
+                            </div>
+                            <div class="card p-2 rounded">
+                                <div class="text-gray-500 text-xs">Device</div>
+                                <div>${data.device || '—'}</div>
+                            </div>
+                        </div>
                     </div>
                 `;
             } else if (data.type && data.type.startsWith('analyze_')) {
